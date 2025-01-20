@@ -1,0 +1,35 @@
+services:
+  nginx:
+    build:
+      context: ./docker/nginx/nginx_1-25-2
+    container_name: job-board-nginx
+    depends_on:
+      - php
+    ports:
+      - '80:80'
+  php:
+    build:
+      context: ./docker/php/php_8-2
+    container_name: job-board-php
+    depends_on:
+      - mysql
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - '9000:9000'
+    volumes:
+      - '.:/var/www/html'
+  mysql:
+    container_name: job-board-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: job-board
+      MYSQL_USER: montisgal
+      MYSQL_PASSWORD: montisgal
+    image: mysql:8.2.0
+    ports:
+      - "3306:3306"
+    volumes:
+      - job-board-db:/var/lib/mysql
+volumes:
+  job-board-db:
